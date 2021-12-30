@@ -16,10 +16,11 @@ def main():
     # print(norm.max)
     # print(norm.max_possible_amplitude)
 
-
     # Create numpy array from AudioSegment
     audio = np.array(norm.get_array_of_samples())
-    print(audio.shape)
+    print("Audio length: {0} seconds".format(len(norm)/1000))
+    print("Array length:", len(audio))
+    print("Vals per ms:", len(audio) / len(norm))
     # print(np.mean(audio))
     # print(np.std(audio))
     # print(np.min(audio))
@@ -27,7 +28,6 @@ def main():
 
     # Get smoothed derivative of normalized audio
     conv = gaussian_derivative(audio, sigma=1.0)
-
     # save_plot(conv, "conv{0}.png".format(1.0))
     # save_plot(audio, "audio.png")
     # save_plot(convolve_median(audio, 5), "median{0}.png".format(1.0))
@@ -35,17 +35,18 @@ def main():
     # split_on_silence
     # https://github.com/jiaaro/pydub/blob/master/pydub/silence.py#L112
 
-
     silences = detect_nonsilent(conv, 1000, 50)
     ratio = len(norm) / len(conv)
+    count = 0
     for i, seg in enumerate(silences):
         if seg[1]*ratio - seg[0]*ratio < 50: # skip if less than 50 milliseconds
             continue
         sliced = norm[seg[0] * ratio : seg[1] * ratio]
         out_file = "./splitAudio/chunk{0}.wav".format(i)
-        print("exporting", out_file)
-        print(seg[1]*ratio - seg[0]*ratio)
-        sliced.export(out_file, format="wav")
+        print("exporting", out_file, seg[1]*ratio - seg[0]*ratio)
+        count += 1
+        #sliced.export(out_file, format="wav")
+    print("\nAccepted segments:", count)
 
 if __name__ == "__main__":
     main()
