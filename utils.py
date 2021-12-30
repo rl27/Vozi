@@ -29,10 +29,13 @@ def detect_silence(audio_segment, min_silence_len=1000, silence_thresh=50, seek_
     last_slice_start = seg_len - min_silence_len
     slice_starts = range(0, last_slice_start + 1, seek_step)
 
+    squared = audio_segment**2
+    squared = np.append(squared, [0])
+    s = np.sum(squared[:min_silence_len])
     for i in slice_starts:
-        audio_slice = audio_segment[i:i + min_silence_len]
-        if np.sqrt(np.mean(audio_slice**2)) <= silence_thresh: # rms
+        if np.sqrt(np.abs(s)/min_silence_len) <= silence_thresh: # rms
             silence_starts.append(i)
+        s = s + squared[i + min_silence_len] - squared[i]
 
     # exit when there is no silence
     if not silence_starts:
