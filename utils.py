@@ -3,6 +3,7 @@ from scipy import ndimage
 import matplotlib.pyplot as plt
 # import cv2
 
+# https://github.com/jiaaro/pydub/blob/7b0d27a4eb7246324601ff1a120397eeddfa3ee5/pydub/silence.py#L9
 def detect_silence(audio_segment, min_silence_len=1000, silence_thresh=50, seek_step=1):
     """
     Returns a list of all silent sections [start, end] of audio_segment.
@@ -62,7 +63,7 @@ def detect_silence(audio_segment, min_silence_len=1000, silence_thresh=50, seek_
 
     return silent_ranges
 
-
+# https://github.com/jiaaro/pydub/blob/7b0d27a4eb7246324601ff1a120397eeddfa3ee5/pydub/silence.py#L76
 def detect_nonsilent(audio_segment, min_silence_len=1000, silence_thresh=50, seek_step=1):
     """
     Returns a list of all nonsilent sections [start, end] of audio_segment.
