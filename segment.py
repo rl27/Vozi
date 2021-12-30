@@ -46,10 +46,10 @@ def main():
         if args.outdir:
             outdir = args.outdir
 
-        silences = detect_nonsilent(conv, 1000, 50)
+        segments = detect_nonsilent(conv, 1000, 50)
         ratio = len(norm) / len(conv)
         count = 0
-        for i, seg in enumerate(silences):
+        for i, seg in enumerate(segments):
             if seg[1]*ratio - seg[0]*ratio < 50: # skip if less than 50 milliseconds
                 continue
             sliced = norm[seg[0] * ratio : seg[1] * ratio]
@@ -58,6 +58,15 @@ def main():
             count += 1
             sliced.export(out_file, format="wav")
         print("\nAccepted segments:", count)
+
+
+        # All non-silent segments combined
+        keep = 0
+        combined = norm[segments[0][0]*ratio:segments[0][1]*ratio + keep]
+        for i in range(1,len(segments)):
+            combined += norm[segments[i][0]*ratio:segments[i][1]*ratio + keep]
+        combined.export("{0}/combined{1}.wav".format(outdir, keep), format="wav")
+
 
     except Exception as e:
         print(e)
