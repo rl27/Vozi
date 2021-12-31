@@ -46,11 +46,11 @@ def main():
     # split_on_silence
     # https://github.com/jiaaro/pydub/blob/master/pydub/silence.py#L112
 
-    outdir = "./splitAudio"
+    outdir = "./splitVocals"
     if args.outdir:
         outdir = args.outdir
 
-    segments = detect_nonsilent(conv, 1000, 50)
+    segments = detect_nonsilent(conv, 1000, 50) # From very limited testing it seems that silence threshold scales with variance.
     ratio = len(norm) / len(conv)
     count = 0
     for i, seg in enumerate(segments):
@@ -65,11 +65,11 @@ def main():
 
 
     # All non-silent segments combined
-    keep = 0
-    combined = norm[segments[0][0]*ratio:segments[0][1]*ratio + keep]
-    for i in range(1,len(segments)):
-        combined += norm[segments[i][0]*ratio:segments[i][1]*ratio + keep]
-    combined.export("{0}/combined{1}.wav".format(outdir, keep), format="wav")
+    # keep = 0
+    # combined = norm[segments[0][0]*ratio:segments[0][1]*ratio + keep]
+    # for i in range(1,len(segments)):
+    #     combined += norm[segments[i][0]*ratio:segments[i][1]*ratio + keep]
+    # combined.export("{0}/combined{1}.wav".format(outdir, keep), format="wav")
     
 
 if __name__ == "__main__":

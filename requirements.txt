@@ -4,3 +4,4 @@ matplotlib
 pydub
 ffmpeg
 librosa
+aubio

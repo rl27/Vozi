@@ -19,7 +19,7 @@ def main():
     # Get smoothed derivative of audio
     conv = gaussian_derivative(audio, sigma=1.0)
 
-    outdir = "./splitAudio"
+    outdir = "./splitVocals"
     if args.outdir:
         outdir = args.outdir
 
@@ -38,11 +38,11 @@ def main():
 
 
     # All non-silent segments combined
-    keep = 0
-    combined = audio[segments[0][0] : segments[0][1] + keep]
-    for i in range(1,len(segments)):
-        combined = np.append(combined, audio[segments[i][0] : segments[i][1] + keep])
-    sf.write("{0}/combined{1}.wav".format(outdir, keep), combined, sample_rate)
+    # keep = 0
+    # combined = audio[segments[0][0] : segments[0][1] + keep]
+    # for i in range(1,len(segments)):
+    #     combined = np.append(combined, audio[segments[i][0] : segments[i][1] + keep])
+    # sf.write("{0}/combined{1}.wav".format(outdir, keep), combined, sample_rate)
     
 
 if __name__ == "__main__":
