@@ -22,10 +22,10 @@ def main():
         sound_file = AudioSegment.from_file(filename, ext)
 
     norm = effects.normalize(sound_file)    # https://github.com/jiaaro/pydub/blob/master/pydub/effects.py#L36
-    print(sound_file.max)
-    print(sound_file.max_possible_amplitude)
-    print(norm.max)
-    print(norm.max_possible_amplitude)
+    # print(sound_file.max)
+    # print(sound_file.max_possible_amplitude)
+    # print(norm.max)
+    # print(norm.max_possible_amplitude)
 
     # Create numpy array from AudioSegment
     audio = np.array(norm.get_array_of_samples())
@@ -50,7 +50,7 @@ def main():
     if args.outdir:
         outdir = args.outdir
 
-    segments = detect_nonsilent(conv, 1000, 64)
+    segments = detect_nonsilent(conv, 1000, 50)
     ratio = len(norm) / len(conv)
     count = 0
     for i, seg in enumerate(segments):

@@ -3,3 +3,4 @@ scipy
 matplotlib
 pydub
 ffmpeg
+librosa
