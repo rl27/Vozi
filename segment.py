@@ -64,7 +64,7 @@ def main():
     print("\nAccepted segments:", count)
 
 
-    # All non-silent segments combined
+    # # All non-silent segments combined
     # keep = 0
     # combined = norm[segments[0][0]*ratio:segments[0][1]*ratio + keep]
     # for i in range(1,len(segments)):

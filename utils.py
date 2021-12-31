@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import ndimage
 import matplotlib.pyplot as plt
+import librosa
 # import cv2
 
 # https://github.com/jiaaro/pydub/blob/7b0d27a4eb7246324601ff1a120397eeddfa3ee5/pydub/silence.py#L9
@@ -125,6 +126,21 @@ def convolve_median(audio, size=5):
     Takes in audio as an array, and size of median filter. Returns convolved median of audio.
     '''
     return ndimage.median_filter(audio, size=size)
+
+
+def detect_pitch(audio):
+    '''
+    https://stackoverflow.com/a/44009768
+    Takes in the audio and a time t, returns the pitch.
+    '''
+    pitches, magnitudes = librosa.piptrack(audio, threshold=1, ref=np.mean)
+    pitch = 0
+    for i in range(magnitudes.shape[1]):
+        index = np.argmax(magnitudes[:, i])
+        if pitches[index, i] > pitch:
+            pitch = pitches[index,i]
+
+    return pitch
 
 
 def save_plot(vals, name):

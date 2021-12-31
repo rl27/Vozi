@@ -1,8 +1,9 @@
 import numpy as np
-from utils import detect_nonsilent, gaussian_derivative, save_plot
+from utils import detect_nonsilent, gaussian_derivative, detect_pitch, save_plot
 import librosa
 import soundfile as sf
 import aubio
+import wave
 import argparse
 import os
 
@@ -37,14 +38,52 @@ def main():
             beat = librosa.load(filepath)[0]
             beats.append(beat)
             beat_length += librosa.get_duration(beat)
-
-            pitches, magnitudes = librosa.piptrack(S=np.abs(librosa.stft(beat)), threshold=1, ref=np.mean)
-            print(np.mean(pitches))
     print("Beat length:", beat_length)
 
     outdir = "./combined"
     if args.outdir:
         outdir = args.outdir
+
+    # https://librosa.org/doc/main/generated/librosa.effects.pitch_shift.html
+    # https://librosa.org/doc/main/generated/librosa.effects.time_stretch.html
+    # audio, sr = librosa.load("audio/super_idol.wav")
+    # audio = librosa.effects.pitch_shift(audio, sr, n_steps=-1)
+    # audio = librosa.effects.time_stretch(audio, 1.5)
+    # sf.write("test.wav", audio, sr)
+    
+
+    # https://librosa.org/doc/main/generated/librosa.piptrack.html
+    # https://stackoverflow.com/a/44009768
+
+    for seg in beats:
+        print(detect_pitch(seg))
+
+
+
+    # # https://stackoverflow.com/a/43964107
+    # wr = wave.open('splitVocals/combined0.wav', 'r')
+    # par = list(wr.getparams())
+    # par[3] = 0
+    # par = tuple(par)
+    # ww = wave.open('test.wav', 'w')
+    # ww.setparams(par)
+
+    # fr = 20
+    # sz = wr.getframerate() // fr
+    # c = int(wr.getnframes()/sz)  # count of the whole file
+    # shift = 20//fr  # shifting 100 Hz
+    # for num in range(c):
+    #     da = np.frombuffer(wr.readframes(sz), dtype=np.int16)
+    #     left, right = da[0::2], da[1::2]  # left and right channel
+    #     lf, rf = np.fft.rfft(left), np.fft.rfft(right)
+    #     lf, rf = np.roll(lf, shift), np.roll(rf, shift)
+    #     lf[0:shift], rf[0:shift] = 0, 0
+    #     nl, nr = np.fft.irfft(lf), np.fft.irfft(rf)
+    #     ns = np.column_stack((nl, nr)).ravel().astype(np.int16)
+    #     ww.writeframes(ns.tobytes())
+    # wr.close()
+    # ww.close()
+
 
 
     # for _, _, files in os.walk(beatdir):
