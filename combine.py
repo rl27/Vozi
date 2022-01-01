@@ -1,5 +1,5 @@
 import numpy as np
-from utils import detect_nonsilent, gaussian_derivative, detect_pitch, save_plot
+from utils import detect_nonsilent, gaussian_derivative, detect_pitch, smooth, save_plot
 import librosa
 import soundfile as sf
 import aubio
@@ -44,19 +44,33 @@ def main():
     if args.outdir:
         outdir = args.outdir
 
-    # https://librosa.org/doc/main/generated/librosa.effects.pitch_shift.html
-    # https://librosa.org/doc/main/generated/librosa.effects.time_stretch.html
+
+    
+    
+
+
+
+    for seg in beats:
+        print(detect_pitch(seg))
+
+    # print(detect_pitch(librosa.load("audio/gtasa.wav")[0]))
+
+
+    '''
+    Change pitch and speed of vocals to match beat
+    https://librosa.org/doc/main/generated/librosa.effects.pitch_shift.html
+    https://librosa.org/doc/main/generated/librosa.effects.time_stretch.html
+    '''
     # audio, sr = librosa.load("audio/super_idol.wav")
     # audio = librosa.effects.pitch_shift(audio, sr, n_steps=-1)
     # audio = librosa.effects.time_stretch(audio, 1.5)
     # sf.write("test.wav", audio, sr)
     
 
-    # https://librosa.org/doc/main/generated/librosa.piptrack.html
-    # https://stackoverflow.com/a/44009768
+    # Option 1 (easier): match beats one-to-one
 
-    for seg in beats:
-        print(detect_pitch(seg))
+
+    # Option 2 (harder): try to match lengths
 
 
 
@@ -116,38 +130,6 @@ def main():
 
     #         print(np.mean(pitches))
 
-
-    # Change pitch and speed of vocals to match beat
-
-    # Option 1 (easier): match beats one-to-one
-
-
-    # Option 2 (harder): try to match lengths
-
-
-
-
-
-    # segments = detect_nonsilent(conv, 200, 0.0045)
-    # ratio = 1000 * librosa.get_duration(audio) / len(conv) # values in audio array per millisecond
-    # count = 0
-    # for i, seg in enumerate(segments):
-    #     if seg[1] * ratio - seg[0] * ratio < 50: # skip if less than 50 milliseconds
-    #         continue
-    #     sliced = audio[seg[0] : seg[1]]
-    #     out_file = "{0}/chunk{1}.wav".format(outdir, i)
-    #     print("exporting", out_file, seg[1] * ratio - seg[0] * ratio)
-    #     count += 1
-    #     sf.write(out_file, sliced, sample_rate)
-    # print("\nAccepted segments:", count)
-
-
-    # # All non-silent segments combined
-    # keep = 0
-    # combined = audio[segments[0][0] : segments[0][1] + keep]
-    # for i in range(1,len(segments)):
-    #     combined = np.append(combined, audio[segments[i][0] : segments[i][1] + keep])
-    # sf.write("{0}/combined{1}.wav".format(outdir, keep), combined, sample_rate)
     
 
 if __name__ == "__main__":

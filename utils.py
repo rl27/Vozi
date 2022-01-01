@@ -109,7 +109,7 @@ def gaussian_derivative(audio, sigma=1.0):
     '''
     # sigma controls the amount of smoothing
     sigma = 1
-    # filter half-width should be roughly 3*sigma
+    # filter half-width should be at least 3*sigma
     half_width = int(3 * sigma)
 
     # Get 1D gaussian derivative filter
@@ -131,20 +131,49 @@ def convolve_median(audio, size=5):
 def detect_pitch(audio):
     '''
     https://stackoverflow.com/a/44009768
-    Takes in the audio and a time t, returns the pitch.
+    https://librosa.org/doc/main/generated/librosa.piptrack.html
+    Takes in the audio loaded via librosa.load and returns the pitch.
     '''
     pitches, magnitudes = librosa.piptrack(audio, threshold=1, ref=np.mean)
-    pitch = 0
+    p2 = []
     for i in range(magnitudes.shape[1]):
-        index = np.argmax(magnitudes[:, i])
-        if pitches[index, i] > pitch:
-            pitch = pitches[index,i]
+        p2.append(pitches[np.argmax(magnitudes[:,i]),i])
 
-    return pitch
+    #new_pitches = []
+    #new_magnitudes = []
+    p2 = []
+    for i in range(magnitudes.shape[1]):
+        p2.append(pitches[np.argmax(magnitudes[:,i]),i])
+        #new_pitches.append(np.max(pitches[:,i]))
+        #new_magnitudes.append(np.max(magnitudes[:,i]))
+
+    # pitches = smooth(new_pitches)
+    # p2 = smooth(p2)
+    # save_plot(pitches, "test0.png")
+    # save_plot(p2, "test1.png")
+
+    return np.max(p2)
+
+
+def smooth(x, window_len=11, window='hanning'):
+    if window_len < 3:
+        return x
+    if window not in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+        raise ValueError("Window must be one of of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
+
+    s = np.r_[2*x[0] - x[window_len-1::-1], x, 2*x[-1]-x[-1:-window_len:-1]]
+
+    if window == 'flat': # moving average
+        w = np.ones(window_len,'d')
+    else:
+        w = eval('np.' + window + '(window_len)')
+
+    y = np.convolve(w / np.sum(w), s, mode='same')
+    return y[window_len:-window_len+1]
 
 
 def save_plot(vals, name):
     plt.figure(figsize=(30,8))
     plt.plot(vals)
     plt.savefig("plots/{0}".format(name))
-    plt.clf()
+    plt.close()
