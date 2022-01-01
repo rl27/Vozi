@@ -152,7 +152,7 @@ def detect_pitch(audio):
     # save_plot(pitches, "test0.png")
     # save_plot(p2, "test1.png")
 
-    return np.max(p2)
+    return smooth(p2)
 
 
 def smooth(x, window_len=11, window='hanning'):

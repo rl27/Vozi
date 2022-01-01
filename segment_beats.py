@@ -33,7 +33,7 @@ def main():
         outdir = args.outdir
 
     for i, seg in enumerate(segments):
-        out_file = "{0}/chunk{1}.wav".format(outdir, i)
+        out_file = "{0}/chunk{1}.wav".format(outdir, str(i).zfill(4))
         print("exporting", out_file)
         sf.write(out_file, seg, sample_rate)
     

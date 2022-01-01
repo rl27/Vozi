@@ -57,7 +57,7 @@ def main():
         if seg[1]*ratio - seg[0]*ratio < 50: # skip if less than 50 milliseconds
             continue
         sliced = norm[seg[0] * ratio : seg[1] * ratio]
-        out_file = "{0}/chunk{1}.wav".format(outdir, i)
+        out_file = "{0}/chunk{1}.wav".format(outdir, str(i).zfill(4))
         print("exporting", out_file, seg[1]*ratio - seg[0]*ratio)
         count += 1
         sliced.export(out_file, format="wav")
