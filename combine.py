@@ -1,5 +1,6 @@
 import numpy as np
 from utils import detect_nonsilent, gaussian_derivative, detect_pitch, smooth, save_plot
+from fastdtw import fastdtw
 import librosa
 import soundfile as sf
 import aubio
@@ -63,13 +64,62 @@ def main():
     # audio = librosa.effects.time_stretch(audio, 1.5)
     # sf.write("test.wav", audio, sr)
 
-
     # Not really sure how to properly match pitch of vocals to pitch of beats.
-    # pitch_shift doesn't work as quite as expected when analyzing detect_pitch outputs.
+    # detect_pitch doesn't work as quite as expected on pitch_shifted audio.
     def pitch_match(v, b):
-        v = librosa.effects.pitch_shift(v, 22050, n_steps=0)
+        v_pitch = detect_pitch(v)
+        b_pitch = detect_pitch(b)
+        diff = b_pitch - v_pitch
         return v
 
+        r = 0.5 # pitch shift tuning
+        s = 3   # scale tuning
+        if diff < -450*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=-5*r)
+        elif diff < -350*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=-4*r)
+        elif diff < -250*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=-3*r)
+        elif diff < -150*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=-2*r)
+        elif diff < -50*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=-r)
+        elif diff < 50*s:
+            pass
+        elif diff < 150*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=r)
+        elif diff < 250*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=2*r)
+        elif diff < 350*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=3*r)
+        elif diff < 450*s:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=4*r)
+        else:
+            v = librosa.effects.pitch_shift(v, 22050, n_steps=5*r)
+
+        return v
+
+
+    t0 = beats[0]
+    t1 = np.append(vocals[0], vocals[1])
+    t1 = np.append(t1, vocals[2])
+    # print(detect_pitch(t1))
+    # print(detect_pitch(librosa.effects.pitch_shift(t1, 22050, n_steps=-0.6)))
+    # print(detect_pitch(librosa.effects.pitch_shift(t1, 22050, n_steps=-0.4)))
+    # print(detect_pitch(librosa.effects.pitch_shift(t1, 22050, n_steps=-0.2)))
+    # print(detect_pitch(librosa.effects.pitch_shift(t1, 22050, n_steps=0.2)))
+    # print(detect_pitch(librosa.effects.pitch_shift(t1, 22050, n_steps=0.4)))
+    # print(detect_pitch(librosa.effects.pitch_shift(t1, 22050, n_steps=0.6)))
+    # print()
+    # print(fastdtw(t0,librosa.effects.pitch_shift(t1, 22050, n_steps=-0.6))[0])
+    # print(fastdtw(t0,librosa.effects.pitch_shift(t1, 22050, n_steps=-0.4))[0])
+    # print(fastdtw(t0,librosa.effects.pitch_shift(t1, 22050, n_steps=-0.2))[0])
+    # print(fastdtw(t0,t1)[0])
+    # print(fastdtw(t0,librosa.effects.pitch_shift(t1, 22050, n_steps=0.2))[0])
+    # print(fastdtw(t0,librosa.effects.pitch_shift(t1, 22050, n_steps=0.4))[0])
+    # print(fastdtw(t0,librosa.effects.pitch_shift(t1, 22050, n_steps=0.6))[0])
+    # sf.write("ttt.wav", t1, 22050)
+    
 
     # Option 1 (easier): match vocals to beats one-to-one --- bad quality
     # combined = np.array([])
@@ -85,8 +135,7 @@ def main():
 
     # Option 2 (harder): try to match lengths by using multiple vocals/beats --- better quality (hopefully)
 
-    combined = np.array([])
-
+    # Find matches
     v_indices = []
     for b in b_segments:
         dist = 2
@@ -97,17 +146,24 @@ def main():
                 closest = index
         v_indices.append(closest)
 
+    # Create combinations
+    combined = np.array([])
+
     prev = 0
-    for i in range(len(v_indices)):
+    i = 0
+    while i < len(v_indices):
         b = beats[i]
-        v = vocals[prev]
-        for v2 in vocals[prev+1 : v_indices[i]]:
+        while i < len(v_indices) - 1 and v_indices[i] == v_indices[i+1]:
+            i += 1
+            b = np.append(b, beats[i])
+        v = np.array([])
+        for v2 in vocals[prev : v_indices[i]+1]:
             v = np.append(v, v2)
-        prev = v_indices[i]
+        prev = v_indices[i] + 1
         v = librosa.effects.time_stretch(v, len(v)/len(b))
         v = pitch_match(v, b)
-        combined = np.append(combined, (np.array(v) + np.array(b))/2)
-
+        combined = np.append(combined, (np.array(v) + np.array(b)))
+        i += 1
 
     
     # Write the output
