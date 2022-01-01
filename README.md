@@ -1,5 +1,5 @@
 # Vozi
-A tool to extract syllables from an audio segment.
+A tool for extracting syllables and beats from audio files, and for remixing vocals with beats.
 
 To segment vocals:
 ```
