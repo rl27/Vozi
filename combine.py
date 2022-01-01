@@ -65,70 +65,12 @@ def main():
     # audio = librosa.effects.pitch_shift(audio, sr, n_steps=-1)
     # audio = librosa.effects.time_stretch(audio, 1.5)
     # sf.write("test.wav", audio, sr)
-    
+
 
     # Option 1 (easier): match beats one-to-one
 
 
     # Option 2 (harder): try to match lengths
-
-
-
-    # # https://stackoverflow.com/a/43964107
-    # wr = wave.open('splitVocals/combined0.wav', 'r')
-    # par = list(wr.getparams())
-    # par[3] = 0
-    # par = tuple(par)
-    # ww = wave.open('test.wav', 'w')
-    # ww.setparams(par)
-
-    # fr = 20
-    # sz = wr.getframerate() // fr
-    # c = int(wr.getnframes()/sz)  # count of the whole file
-    # shift = 20//fr  # shifting 100 Hz
-    # for num in range(c):
-    #     da = np.frombuffer(wr.readframes(sz), dtype=np.int16)
-    #     left, right = da[0::2], da[1::2]  # left and right channel
-    #     lf, rf = np.fft.rfft(left), np.fft.rfft(right)
-    #     lf, rf = np.roll(lf, shift), np.roll(rf, shift)
-    #     lf[0:shift], rf[0:shift] = 0, 0
-    #     nl, nr = np.fft.irfft(lf), np.fft.irfft(rf)
-    #     ns = np.column_stack((nl, nr)).ravel().astype(np.int16)
-    #     ww.writeframes(ns.tobytes())
-    # wr.close()
-    # ww.close()
-
-
-
-    # for _, _, files in os.walk(beatdir):
-    #     for file in files:
-    #         filepath = os.path.join(beatdir, file)
-    #         win_s = 4096
-    #         hop_s = 512 
-
-    #         s = aubio.source(filepath, 22050, hop_s)
-    #         samplerate = s.samplerate
-
-    #         tolerance = 0.8
-
-    #         pitch_o = aubio.pitch("yin", win_s, hop_s, samplerate)
-    #         pitch_o.set_unit("midi")
-    #         pitch_o.set_tolerance(tolerance)
-
-    #         pitches = []
-    #         confidences = []
-
-    #         total_frames = 0
-    #         while True:
-    #             samples, read = s()
-    #             pitch = pitch_o(samples)[0]
-    #             pitches += [pitch]
-    #             confidence = pitch_o.get_confidence()
-    #             confidences += [confidence]
-    #             total_frames += read
-    #             if read < hop_s: break
-
-    #         print(np.mean(pitches))
 
     
 
